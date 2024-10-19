@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tirage Manuelle</title>
+</head>
+<body>
+  <h1>Tirage Crypto</h1>
+  <button id="tirageBtn">Lancer le Tirage</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.6/web3.min.js"></script>
+  <script>
+    const contractAddress = "0xYourContractAddress"; // Adresse de ton contrat
+    const abi = [ /* ABI générée après déploiement */ ];
+
+    let web3 = new Web3(window.ethereum);
+
+    window.ethereum.enable().then(() => {
+      const contract = new web3.eth.Contract(abi, contractAddress);
+      const accounts = web3.eth.getAccounts();
+      
+      document.getElementById('tirageBtn').addEventListener('click', () => {
+        contract.methods.tirer().send({ from: accounts[0] })
+          .then((tx) => {
+            console.log("Tirage effectué:", tx);
+          })
+          .catch((error) => {
+            console.error("Erreur lors du tirage:", error);
+          });
+      });
+    });
+  </script>
+</body>
+</html>
