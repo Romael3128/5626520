@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Participez au Tirage Crypto</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      cursor: pointer;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+
+    .info {
+      margin-top: 30px;
+    }
+
+    .info p {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Participez au Tirage Crypto !</h1>
+
+  <button id="connectWallet">Connecter MetaMask</button>
+  <button id="participerTirage" style="display:none;">Participer au Tirage (5$ en BNB)</button>
+
+  <div class="info">
+    <p id="walletInfo"></p>
+    <p id="messageInfo"></p>
+  </div>
+
+  <script>
+    // Déclaration des variables
+    let web3;
+    let contract;
+    let accounts;
+    const contractAddress = "VOTRE_ADRESSE_CONTRAT"; // Remplacez par l'adresse de votre smart contract
+    const contractABI = [
+      // Remplacez cette partie par l'ABI de votre smart contract
+    ];
+
+    // Vérifier si MetaMask est installé
+    if (typeof window.ethereum !== 'undefined') {
+      console.log('MetaMask détecté !');
+    } else {
+      alert('Veuillez installer MetaMask pour participer au tirage.');
+    }
+
+    // Connexion à MetaMask
+    async function connectMetaMask() {
+      try {
+        accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        web3 = new Web3(ethereum);
+        contract = new web3.eth.Contract(contractABI, contractAddress);
+
+        document.getElementById('walletInfo').textContent = "Wallet connecté : " + accounts[0];
+        document.getElementById('connectWallet').style.display = "none";
+        document.getElementById('participerTirage').style.display = "block";
+      } catch (error) {
+        console.error('Erreur lors de la connexion à MetaMask', error);
+      }
+    }
+
+    // Fonction pour participer au tirage (envoi de 5$ en BNB)
+    async function participerTirage() {
+      try {
+        if (!accounts) {
+          alert("Vous devez connecter MetaMask avant de participer.");
+          return;
+        }
+
+        const montant = web3.utils.toWei('5', 'ether'); // 5$ en BNB (en BNB)
+
+        // Appeler le smart contract pour inscrire l'utilisateur
+        await contract.methods.inscrire().send({
+          from: accounts[0],
+          value: montant
+        });
+
+        document.getElementById('messageInfo').textContent = "Vous avez participé au tirage avec succès !";
+      } catch (error) {
+        console.error('Erreur lors de la participation au tirage', error);
+        document.getElementById('messageInfo').textContent = "Erreur lors de la participation au tirage.";
+      }
+    }
+
+    // Événements pour les boutons
+    document.getElementById('connectWallet').addEventListener("click", connectMetaMask);
+    document.getElementById('participerTirage').addEventListener("click", participerTirage);
+  </script>
+
+</body>
+</html>
